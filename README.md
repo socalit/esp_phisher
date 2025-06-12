@@ -111,7 +111,7 @@ This software is for educational and research purposes only.
 
 **SoCal IT**  
 Ethical hacker & Wi-Fi tools developer  
-Creator of [`alfa-wifi`](https://github.com/socal-it/alfa-wifi), and more.
+Creator of [`alfa-wifi`](https://github.com/socalit/alfa-wifi), and more.
 
 ---
 
