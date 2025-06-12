@@ -1,15 +1,3 @@
-## 📸 Demo Screenshots
-
-### 🔧 Hardware Setup
-<img src="demo/hardware.jpg" width="60%">
-
-### 🌐 Captive Portal View
-<img src="demo/captive.jpg" width="60%">
-
-### 🛠️ Admin Interface
-<img src="demo/admin.jpg" width="60%">
-
-
 > ⚠️ **Educational use only. Do not deploy without explicit permission.**
 
 `esp-phisher` is a proof-of-concept tool built on the ESP32 platform that demonstrates how attackers can use fake Wi-Fi captive portals to phish credentials from unsuspecting users. The tool is designed to **educate users about the dangers of blindly trusting public login pages** and raise awareness around social engineering attacks over Wi-Fi.
@@ -104,6 +92,18 @@ This software is for educational and research purposes only.
 **You are responsible for using this code in legal and ethical contexts.**
 
 > Deploying this tool on networks without consent is **illegal** and violates the [Computer Fraud and Abuse Act](https://www.law.cornell.edu/uscode/text/18/1030).
+
+---
+## 📸 Demo Screenshots
+
+### 🔧 Hardware Setup
+<img src="demo/hardware.jpg" width="40%">
+
+### 🌐 Captive Portal View
+<img src="demo/captive.jpg" width="40%">
+
+### 🛠️ Admin Interface
+<img src="demo/admin.jpg" width="40%">
 
 ---
 
