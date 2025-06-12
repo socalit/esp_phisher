@@ -97,7 +97,7 @@ This software is for educational and research purposes only.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **SoCal IT**  
 Ethical hacker & Wi-Fi tools developer  
