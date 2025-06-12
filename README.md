@@ -1,14 +1,14 @@
-# esp-phisher
 ## 📸 Demo Screenshots
 
 ### 🔧 Hardware Setup
-![Hardware Setup](demo/hardware.jpg)
+<img src="demo/hardware.jpg" width="60%">
 
 ### 🌐 Captive Portal View
-![Captive Portal](demo/captive.jpg)
+<img src="demo/captive.jpg" width="60%">
 
 ### 🛠️ Admin Interface
-![Admin Interface](demo/admin.jpg)
+<img src="demo/admin.jpg" width="60%">
+
 
 > ⚠️ **Educational use only. Do not deploy without explicit permission.**
 
