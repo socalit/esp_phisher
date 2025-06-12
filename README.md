@@ -1,10 +1,10 @@
-> ⚠️ **Educational use only. Do not deploy without explicit permission.**
+>  **Educational use only. Do not deploy without explicit permission.**
 
 `esp-phisher` is a proof-of-concept tool built on the ESP32 platform that demonstrates how attackers can use fake Wi-Fi captive portals to phish credentials from unsuspecting users. The tool is designed to **educate users about the dangers of blindly trusting public login pages** and raise awareness around social engineering attacks over Wi-Fi.
 
 ---
 
-## 📷 Overview
+##  Overview
 
 - Runs on ESP-WROOM-32 with a 128x32 OLED display
 - Creates a fake Wi-Fi access point
@@ -19,7 +19,7 @@
 
 ---
 
-## 🛡️ Educational Purpose
+##  Educational Purpose
 
 > This project was created **to educate users about the dangers of blindly trusting login screens**, especially on public Wi-Fi networks. It demonstrates how easily a convincing phishing portal can be deployed on inexpensive hardware like the ESP32.
 
@@ -27,7 +27,7 @@
 
 ---
 
-## ✅ Current Features
+##  Current Features
 
 - Captive portal styled login page
 - OLED-based SSID selector and menu navigation (buttons: Up, Down, Enter, Back)
@@ -37,23 +37,23 @@
 - Visual login alert on OLED when new data is captured
 - Wi-Fi access point automatically starts with selected SSID
 - **LED indicators for status**:
-  - 🔴 **PWR (GPIO 12):** Off means no new logs. Solid means a new login was captured.
-  - 🔵 **TX (GPIO 13):** Blinking means broadcasting ssid. Solid when a Client connected to the SSID.
-  - 🟢 **RX (GPIO 14):** Blinking means a problem; see OLED for details. Solid means the system is operational.
+  -  **PWR (GPIO 12):** Off means no new logs. Solid means a new login was captured.
+  -  **TX (GPIO 13):** Blinking means broadcasting ssid. Solid when a Client connected to the SSID.
+  -  **RX (GPIO 14):** Blinking means a problem; see OLED for details. Solid means the system is operational.
 
 ---
 
-## 🧪 Planned Features
+##  Planned Features
 
-- [ ] Wi-Fi passthrough support
-- [ ] `sslstrip` integration to downgrade HTTPS to HTTP
-- [ ] Full MITM (Man-in-the-Middle) capability for traffic inspection
-- [ ] Browser certificate spoof warning emulation
-- [ ] Cross-platform captive portal detection bypass
+-  Wi-Fi passthrough support
+-  `sslstrip` integration to downgrade HTTPS to HTTP
+-  Full MITM (Man-in-the-Middle) capability for traffic inspection
+-  Browser certificate spoof warning emulation
+-  Cross-platform captive portal detection bypass
 
 ---
 
-## 🛠️ Hardware Requirements
+##  Hardware Requirements
 
 - ESP32 WROOM-32 board (e.g., AITRIP DevKit)
 - 0.91" 128x32 I2C OLED (SSD1306)
@@ -66,7 +66,7 @@
 
 ---
 
-## ⚙️ Setup
+##  Setup
 
 1. Clone this repo and open the `.ino` sketch in Arduino IDE
 2. Install dependencies:
@@ -86,7 +86,7 @@
 
 ---
 
-## 🔒 Legal Disclaimer
+##  Legal Disclaimer
 
 This software is for educational and research purposes only.  
 **You are responsible for using this code in legal and ethical contexts.**
@@ -94,15 +94,15 @@ This software is for educational and research purposes only.
 > Deploying this tool on networks without consent is **illegal** and violates the [Computer Fraud and Abuse Act](https://www.law.cornell.edu/uscode/text/18/1030).
 
 ---
-## 📸 Demo Screenshots
+##  Demo Screenshots
 
-### 🔧 Hardware Setup
+###  Hardware Setup
 <img src="demo/hardware.jpg" width="40%">
 
-### 🌐 Captive Portal View
+###  Captive Portal View
 <img src="demo/captive.jpg" width="40%">
 
-### 🛠️ Admin Interface
+###  Admin Interface
 <img src="demo/admin.jpg" width="40%">
 
 ---
@@ -115,6 +115,6 @@ Creator of [`alfa-wifi`](https://github.com/socalit/alfa-wifi), and more.
 
 ---
 
-## ⭐️ Support the Project
+##  Support the Project
 
 If this helped your research, education, or DEFCON demo, consider giving it a star 🌟
