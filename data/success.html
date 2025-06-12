@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="1; url=/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connection Success</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      text-align: center;
+      padding-top: 60px;
+    }
+    .message {
+      background: white;
+      display: inline-block;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .spinner {
+      margin-top: 20px;
+      border: 4px solid #eee;
+      border-top: 4px solid #333;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="message">
+    <h2>Connection Successful</h2>
+    <p>You are now connected to the internet.</p>
+    <div class="spinner"></div>
+  </div>
+</body>
+</html>
