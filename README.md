@@ -182,4 +182,14 @@ You are solely responsible for how you use this code.
 
 ---
 
-Made by [@socalit](https://github.com/socalit)
+## Author
+
+**SoCal IT**  
+Ethical hacker & Wi-Fi tools developer  
+Creator of [`alfa-wifi`](https://github.com/socalit/alfa-wifi), and more.
+
+---
+
+##  Support the Project
+
+If this helped your research, education, or DEFCON demo, consider giving it a star 🌟
