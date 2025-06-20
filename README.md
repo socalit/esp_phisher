@@ -1,4 +1,4 @@
-# esp-phisher
+# esp-phisher 1.8.2
 
 **Educational use only. Do not deploy without explicit permission.**
 
