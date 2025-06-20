@@ -85,8 +85,8 @@ GitHub: [github.com/socalit](https://github.com/socalit)
   * New login alert
 * LED indicators:
 
-  * **TX (Red): GPIO 12** – New login captured (solid)
-  * **RX (Blue): GPIO 13** – Client activity (blinks on connect)
+  * **TX (Blue): GPIO 12** – New login captured (solid)
+  * **RX (Red): GPIO 13** – Client / SSID (blinks when broadcasting solid on client connect)
   * **PWR (Green): GPIO 14** – System status (blinks/missing file warning)
 
 ---
@@ -143,7 +143,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
    * EEPROM
    * SD
 3. Wire the components as listed
-4. Format an SD card as FAT32 and copy required files
+4. Format an SD card as FAT32 and copy the required files
 5. Upload the sketch to the ESP32
 6. Connect to the generated Wi-Fi and test
 
@@ -159,14 +159,15 @@ This project was created to educate users about the risks of trusting captive po
 
 ---
 
-## Planned Features
+### 🧪 Future Feature Roadmap *(If Project Gains Popularity)*
 
-* Wi-Fi passthrough (for internet access while sniffing)
-* `sslstrip` support to downgrade HTTPS to HTTP
-* Full MITM traffic inspection
-* Certificate spoof warning emulation
-* WebSocket-based live log view
-* ESP32-C3 compatibility
+The following features are planned **only if `esp-phisher` receives significant community interest and GitHub stars**:
+
+- **Wi-Fi Passthrough Mode**  
+- **QR Code Support**  
+- **Offline Log Export**  
+- **OTA Updates via Admin Panel**  
+- **Session Timer**  
 
 ---
 
