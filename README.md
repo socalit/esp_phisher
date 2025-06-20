@@ -25,7 +25,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-## Version: v1.8.2-OLEDdebug-scroll (June 2025)
+## Version: v1.8.2 (June 2025)
 
 ### New Features
 
