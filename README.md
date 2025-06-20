@@ -1,109 +1,184 @@
->  **Educational use only. Do not deploy without explicit permission.**
+# esp-phisher v1.8.2
 
-`esp-phisher` is a proof-of-concept tool built on the ESP32 platform that demonstrates how attackers can use fake Wi-Fi captive portals to phish credentials from unsuspecting users. The tool is designed to **educate users about the dangers of blindly trusting public login pages** and raise awareness around social engineering attacks over Wi-Fi.
+**Educational use only. Do not deploy without explicit permission.**
 
----
+`esp-phisher` is a proof-of-concept tool built on the ESP32 platform that demonstrates how attackers can use fake Wi-Fi captive portals to phish credentials from unsuspecting users. The tool is designed to educate users about the dangers of blindly trusting public login pages and raise awareness around social engineering attacks over Wi-Fi.
 
-##  Overview
-
-- Runs on ESP-WROOM-32 with a 128x32 OLED display
-- Creates a fake Wi-Fi access point
-- Serves a realistic captive portal mimicking login screens (Google, Facebook, Instagram, TikTok)
-- Captures and logs submitted credentials to `log.txt`
-- Includes a built-in admin panel with:
-  - OLED SSID selection
-  - Login viewer (web-based)
-  - Clear logs
-  - OLED menu for viewing connected devices and new login alerts
-- Admin page at `192.168.4.1/?key=3000`
+GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-##  Educational Purpose
+## Overview
 
-> This project was created **to educate users about the dangers of blindly trusting login screens**, especially on public Wi-Fi networks. It demonstrates how easily a convincing phishing portal can be deployed on inexpensive hardware like the ESP32.
+* Runs on ESP-WROOM-32 with a 128x32 OLED display
+* Creates a fake Wi-Fi access point with customizable SSID
+* Serves a realistic captive portal mimicking login screens (Google, Facebook, Instagram, TikTok)
+* Captures and logs submitted credentials to `log.txt` on SD card
+* Admin panel at `192.168.4.1/?key=3000` for managing logs and settings
+* OLED-based menu system with:
 
-> The goal is to **raise awareness** of network-based social engineering risks and promote better cybersecurity hygiene — such as verifying captive portals, using VPNs, and enabling 2FA.
-
----
-
-##  Current Features
-
-- Captive portal styled login page
-- OLED-based SSID selector and menu navigation (buttons: Up, Down, Enter, Back)
-- SD card logging (`log.txt`)
-- EEPROM-stored SSID persistence
-- Admin web UI to view/clear logs and update SSID
-- Visual login alert on OLED when new data is captured
-- Wi-Fi access point automatically starts with selected SSID
-- **LED indicators for status**:
-  -  **PWR (GPIO 12):** Off means no new logs. Solid means a new login was captured.
-  -  **TX (GPIO 13):** Blinking means broadcasting ssid. Solid when a Client connected to the SSID.
-  -  **RX (GPIO 14):** Blinking means a problem; see OLED for details. Solid means the system is operational.
+  * SSID selection
+  * View Logins
+  * Clear Logs
+  * Reboot
+* LED indicators for system status and activity
 
 ---
 
-##  Planned Features
+## Version: v1.8.2 (June 2025)
 
--  Wi-Fi passthrough support
--  `sslstrip` integration to downgrade HTTPS to HTTP
--  Full MITM (Man-in-the-Middle) capability for traffic inspection
--  Browser certificate spoof warning emulation
--  Cross-platform captive portal detection bypass
+### New Features
+
+* OLED boot splash showing version + GitHub (`esp-phisher v1.8.2`, `github.com/socalit`)
+* Log viewer now scrolls with Up/Down buttons if over 3 entries
+* Samsung and Android captive portal triggers improved (`/generate_204`, `/connecttest.txt`, etc.)
+* SD card debug: required file check with OLED + Serial error output
+* Auto MAC spoofing as UniFi AP (OUI `28:70:4E`)
+* EEPROM-stored SSID persistence
+* Background image selection via admin panel (bg1–bg4)
+
+### New Web UI Features
+
+#### `index.html` (Captive Portal)
+
+* Responsive, mobile-friendly layout
+* Background image fetched dynamically via `/bg`
+* Platform selection with icons (Google, Facebook, Instagram, TikTok)
+* Dynamic form placeholder (email or username)
+* Terms and Conditions checkbox (required to continue)
+* Auto-restore of platform and terms selection via `localStorage`
+* Error display for incorrect input or invalid email (Google only)
+
+#### `admin.html` (Admin Panel)
+
+* Monospaced log display with scrollable `<pre>` block
+* Buttons to clear logs and mark them as read
+* Admin key protection for clearing logs
+* Background image selector
+* SSID updater (with reboot)
+* AJAX requests for smoother UX
+
+### Bug Fixes
+
+* OLED initialization order corrected (prevents crash on boot)
+* Log size EEPROM sync fixed
+* Captive portal reliably triggers on more Android/Samsung devices
+* Improved error handling when files are missing on SD card
 
 ---
 
-##  Hardware Requirements
+## Current Features
 
-- ESP32 WROOM-32 board (e.g., AITRIP DevKit)
-- 0.91" 128x32 I2C OLED (SSD1306)
-- 4x push buttons (Up, Down, Enter, Back) — connected to GPIOs 32, 33, 25, 26
-- MicroSD card module (CS on GPIO 5)
-- **LEDs for status feedback:**
-  - **Red (GPIO 12):**
-  - **Blue (GPIO 13):**
-  - **Green (GPIO 14):**
+* Captive portal styled login page (HTML + background)
+* OLED-based SSID selector and menu navigation (buttons: Up, Down, Enter, Back)
+* SD card logging to `log.txt`
+* Admin web UI to:
+
+  * View/clear logs
+  * Update SSID
+  * Mark log as read
+  * Change background image
+* OLED home screen shows:
+
+  * SSID name
+  * Connected client count
+  * New login alert
+* LED indicators:
+
+  * **TX (Blue): GPIO 12** – New login captured (solid)
+  * **RX (Red): GPIO 13** – Client / SSID (blinks when broadcasting solid on client connect)
+  * **PWR (Green): GPIO 14** – System status (blinks/missing file warning)
 
 ---
 
-##  Setup
+## Required Files (Place on SD card)
 
-1. Clone this repo and open the `.ino` sketch in Arduino IDE
+```
+/index.html
+/admin.html
+/success.html
+/terms.html
+/log.txt (optional)
+/img/facebook.png
+/img/google.png
+/img/instagram.png
+/img/tiktok.png
+/img/poweredByUniFi.svg
+/img/bg1.jpg
+/img/bg2.jpg
+/img/bg3.jpg
+/img/bg4.jpg
+```
+
+---
+
+## Hardware Requirements
+
+* **ESP32 WROOM-32** (AITRIP DevKit or equivalent)
+* **OLED:** 0.91" 128x32 I2C SSD1306 (GPIO 21 SDA, 22 SCL)
+* **Buttons:**
+
+  * Up: GPIO 32
+  * Down: GPIO 33
+  * Enter: GPIO 25
+  * Back: GPIO 26
+* **LEDs:**
+
+  * TX (Red): GPIO 12
+  * RX (Blue): GPIO 13
+  * PWR (Green): GPIO 14
+* **SD Card Module:** CS on GPIO 5
+
+---
+
+## Setup Instructions
+
+1. Clone the repo and open the `.ino` sketch in Arduino IDE
 2. Install dependencies:
-   - `Adafruit_GFX`
-   - `Adafruit_SSD1306`
-   - `ESPAsyncWebServer`
-   - `DNSServer`
-   - `EEPROM`
-   - `SD`
-3. Connect:
-   - OLED to I2C (GPIO 21 SDA, GPIO 22 SCL)
-   - Buttons: GPIO 32 (Up), 33 (Down), 25 (Enter), 26 (Back)
-   - LEDs: GPIO 12 (Red), 13 (Blue), 14 (Green)
-   - SD card module: GPIO 5 (CS)
-4. Upload via Arduino
-5. On boot, device will start as a Wi-Fi access point
+
+   * Adafruit\_GFX
+   * Adafruit\_SSD1306
+   * ESPAsyncWebServer
+   * DNSServer
+   * EEPROM
+   * SD
+3. Wire the components as listed
+4. Format an SD card as FAT32 and copy the required files
+5. Upload the sketch to the ESP32
+6. Connect to the generated Wi-Fi and test
 
 ---
 
-##  Legal Disclaimer
+## Educational Purpose
 
-This software is for educational and research purposes only.  
-**You are responsible for using this code in legal and ethical contexts.**
+This project was created to educate users about the risks of trusting captive portals without verification. It raises awareness of phishing tactics over open Wi-Fi, and promotes safe practices such as:
 
-> Deploying this tool on networks without consent is **illegal** and violates the [Computer Fraud and Abuse Act](https://www.law.cornell.edu/uscode/text/18/1030).
+* Using VPNs on public networks
+* Verifying captive portal URLs
+* Enabling multi-factor authentication
 
 ---
-##  Demo Screenshots
 
-###  Hardware Setup
-<img src="demo/hardware.jpg" width="40%">
+### 🧪 Future Feature Roadmap *(If Project Gains Popularity)*
 
-###  Captive Portal View
-<img src="demo/captive.jpg" width="40%">
+The following features are planned **only if `esp-phisher` receives significant community interest and GitHub stars**:
 
-###  Admin Interface
-<img src="demo/admin.jpg" width="40%">
+- **Wi-Fi Passthrough Mode**  
+- **QR Code Support**  
+- **Offline Log Export**  
+- **OTA Updates via Admin Panel**  
+- **Session Timer**  
+
+---
+
+## Legal Disclaimer
+
+This software is for educational and research purposes only.
+**Do not use on unauthorized networks.**
+
+Deploying this tool on any network without clear, written permission is illegal and may violate the Computer Fraud and Abuse Act and similar laws.
+
+You are solely responsible for how you use this code.
 
 ---
 
