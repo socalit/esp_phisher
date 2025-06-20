@@ -37,7 +37,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 * EEPROM-stored SSID persistence
 * Background image selection via admin panel (bg1–bg4)
 
-### 🖥️ New Web UI Features
+### New Web UI Features
 
 #### `index.html` (Captive Portal)
 
