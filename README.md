@@ -7,7 +7,7 @@
 GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
-## 📸 Demo
+## Demo
 
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-1.JPG" width="40%">
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-5.JPG" width="40%">
