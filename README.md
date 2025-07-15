@@ -186,4 +186,20 @@ GitHub: [https://github.com/socalit](https://github.com/socalit)
 
 ⭐ Star the project if you found it useful for red teaming, research, or CTF demos.
 
+---
 
+## Credits
+
+- **Feather Icons**  
+  Simple and elegant SVG icons used in the admin panel  
+  https://feathericons.com
+
+- **Chart.js**  
+  JavaScript charting library used for platform/daily analytics  
+  https://www.chartjs.org/
+
+- **Bootstrap 5.3.7**  
+  Responsive front-end framework used in `index.html` and `admin.html`  
+  https://getbootstrap.com
+
+All third-party resources are included under their respective open source licenses.
