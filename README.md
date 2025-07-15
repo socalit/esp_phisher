@@ -1,188 +1,176 @@
-# esp-phisher v1.8.2
+# esp-phisher v2.0.0
 
-**Educational use only. Do not deploy without explicit permission.**
 
-`esp-phisher` is a proof-of-concept tool built on the ESP32 platform that demonstrates how attackers can use fake Wi-Fi captive portals to phish credentials from unsuspecting users. The tool is designed to educate users about the dangers of blindly trusting public login pages and raise awareness around social engineering attacks over Wi-Fi.
+`esp-phisher` is a Wi-Fi phishing proof-of-concept built on an ESP32 that simulates a public captive portal to capture credentials. Version 2.0 introduces a modern Bootstrap UI, credit card capture mode, RTC time sync, improved OLED navigation, SD file serving, and a powerful admin dashboard.
 
 GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
+
 ## Demo
 
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-1.JPG" width="40%">
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-5.JPG" width="40%">
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo2-3.JPG" width="40%">
 
+---
 
 ## Overview
 
-* Runs on ESP-WROOM-32 with a 128x32 OLED display
-* Creates a fake Wi-Fi access point with customizable SSID
-* Serves a realistic captive portal mimicking login screens (Google, Facebook, Instagram, TikTok)
-* Captures and logs submitted credentials to `log.txt` on SD card
-* Admin panel at `192.168.4.1/?key=3000` for managing logs and settings
-* OLED-based menu system with:
-
-  * SSID selection
-  * View Logins
-  * Clear Logs
-  * Reboot
-* LED indicators for system status and activity
+- Runs on ESP-WROOM-32 with 128x32 OLED display
+- Fake Wi-Fi AP with spoofed MAC and customizable SSID
+- Captive portal login options:
+  - Google, Facebook, Instagram, TikTok
+  - Optional credit card form ($10 High-Speed Wi-Fi)
+- Captures credentials + User-Agent with timestamp
+- Admin panel at `192.168.4.1/admin.html?key=3000`
+- Stores logs and content on SD card
+- OLED menu for SSID, logs, reboot
 
 ---
 
-## Version: v1.8.2 (June 2025)
+## New in Version 2.0.0
 
-### New Features
+### Captive Portal (`index.html`)
+- Rewritten in Bootstrap 5.3.7
+- Credit card form with:
+  - Name, number, expiration, CVC, billing address
+  - Auto card type detection
+  - Input formatting + validation
+- Terms & Conditions checkbox
+- Dynamic background (`/bg` from SD card)
 
-* OLED boot splash showing version + GitHub (`esp-phisher v1.8.2`, `github.com/socalit`)
-* Log viewer now scrolls with Up/Down buttons if over 3 entries
-* Samsung and Android captive portal triggers improved (`/generate_204`, `/connecttest.txt`, etc.)
-* SD card debug: required file check with OLED + Serial error output
-* Auto MAC spoofing as UniFi AP (OUI `28:70:4E`)
-* EEPROM-stored SSID persistence
-* Background image selection via admin panel (bg1–bg4)
+### Admin Dashboard (`admin.html`)
+- Bootstrap + Chart.js UI
+- Stats:
+  - Total log count
+  - Platform breakdown
+  - Cards captured
+- Charts:
+  - Platform Split (bar)
+  - Logins per Day (7-day line chart)
+- SSID + Background selection
+- RTC time sync (`/time`)
+- Log viewer with:
+  - Timestamp grouping
+  - Pretty-printed credit card and platform entries
+- Actions: Clear log, Mark as Read
 
-### New Web UI Features
-
-#### `index.html` (Captive Portal)
-
-* Responsive, mobile-friendly layout
-* Background image fetched dynamically via `/bg`
-* Platform selection with icons (Google, Facebook, Instagram, TikTok)
-* Dynamic form placeholder (email or username)
-* Terms and Conditions checkbox (required to continue)
-* Auto-restore of platform and terms selection via `localStorage`
-* Error display for incorrect input or invalid email (Google only)
-
-#### `admin.html` (Admin Panel)
-
-* Monospaced log display with scrollable `<pre>` block
-* Buttons to clear logs and mark them as read
-* Admin key protection for clearing logs
-* Background image selector
-* SSID updater (with reboot)
-* AJAX requests for smoother UX
-
-### Bug Fixes
-
-* OLED initialization order corrected (prevents crash on boot)
-* Log size EEPROM sync fixed
-* Captive portal reliably triggers on more Android/Samsung devices
-* Improved error handling when files are missing on SD card
-
----
-
-## Current Features
-
-* Captive portal styled login page (HTML + background)
-* OLED-based SSID selector and menu navigation (buttons: Up, Down, Enter, Back)
-* SD card logging to `log.txt`
-* Admin web UI to:
-
-  * View/clear logs
-  * Update SSID
-  * Mark log as read
-  * Change background image
-* OLED home screen shows:
-
-  * SSID name
-  * Connected client count
-  * New login alert
-* LED indicators:
-
-  * **TX (Blue): GPIO 12** – New login captured (solid)
-  * **RX (Red): GPIO 13** – Client / SSID (blinks when broadcasting solid on client connect)
-  * **PWR (Green): GPIO 14** – System status (blinks/missing file warning)
-
----
-
-## Required Files (Place on SD card)
-
-```
-/index.html
-/admin.html
-/success.html
-/terms.html
-/log.txt (optional)
-/img/facebook.png
-/img/google.png
-/img/instagram.png
-/img/tiktok.png
-/img/poweredByUniFi.svg
-/img/bg1.jpg
-/img/bg2.jpg
-/img/bg3.jpg
-/img/bg4.jpg
-```
+### Logging & RTC
+- Logs stored as `[YYYY-MM-DD HH:MM:SS] [Platform] ...`
+- Captures full `User-Agent`
+- Timestamp via DS3231 RTC module
+- EEPROM used to track unread entries
 
 ---
 
 ## Hardware Requirements
 
-* **ESP32 WROOM-32** (AITRIP DevKit or equivalent)
-* **OLED:** 0.91" 128x32 I2C SSD1306 (GPIO 21 SDA, 22 SCL)
-* **Buttons:**
+| Component            | Connection Details                   |
+|---------------------|----------------------------------------|
+| ESP32 Dev Board      | AITRIP ESP-WROOM-32                   |
+| SD Card Module       | SPI (CS: GPIO 5)                      |
+| SSD1306 OLED (0.91") | I2C (SDA: GPIO 21, SCL: GPIO 22)      |
+| RTC DS3231 Module    | I2C shared with OLED                  |
+| Button – Up          | GPIO 32                               |
+| Button – Down        | GPIO 33                               |
+| Button – Enter       | GPIO 25                               |
+| Button – Back        | GPIO 26                               |
+| LED 1 (Login)        | GPIO 12                               |
+| LED 2 (Client)       | GPIO 13                               |
+| LED 3 (Power)        | GPIO 14                               |
 
-  * Up: GPIO 32
-  * Down: GPIO 33
-  * Enter: GPIO 25
-  * Back: GPIO 26
-* **LEDs:**
+> SD uses SPI (MISO: 19, MOSI: 23, SCK: 18). Level-shift SD if 5V-only. Use pulldown resistors for buttons.
 
-  * TX (Red): GPIO 12
-  * RX (Blue): GPIO 13
-  * PWR (Green): GPIO 14
-* **SD Card Module:** CS on GPIO 5
+---
+
+## SD Card File Structure
+/index.html
+/admin.html
+/success.html
+/terms.html
+/log.txt
+/bootstrap-5.3.7/css/bootstrap.min.css
+/bootstrap-5.3.7/js/bootstrap.bundle.min.js
+/chart.umd.min.js
+/img/bg.jpg <-- selected background
+/img/bg1.jpg … bg5.jpg <-- optional images
+/img/google.png
+/img/facebook.png
+/img/instagram.png
+/img/tiktok.png
+/img/feather/*.svg
+
+---
+
+## OLED Menu System
+
+- Navigated via 4 physical buttons
+- Menu options:
+  - View log entries
+  - Clear logs
+  - Reboot device
+  - Change SSID
+- OLED home screen:
+  - SSID name
+  - Client count
+  - New login indicator
+
+---
+
+## Captive Portal Flow
+
+- Starts AP with spoofed UniFi-style MAC
+- Captures all DNS and redirects to `index.html`
+- Accepts POSTs to `/submit`
+- Saves formatted logs to `log.txt`
+- Redirects to `success.html` then `google.com`
+
+---
+
+## Admin Access
+
+Visit: http://192.168.4.1/admin.html?key=3000
+
+
+Features:
+- Log viewing + platform parsing
+- SSID + background update
+- Set current time (RTC)
+- Charts for usage analytics
+- Clear or mark logs as read
 
 ---
 
 ## Setup Instructions
 
-1. Clone the repo and open the `.ino` sketch in Arduino IDE
-2. Install dependencies:
-
-   * Adafruit\_GFX
-   * Adafruit\_SSD1306
-   * ESPAsyncWebServer
-   * DNSServer
-   * EEPROM
-   * SD
-3. Wire the components as listed
-4. Format an SD card as FAT32 and copy the required files
-5. Upload the sketch to the ESP32
-6. Connect to the generated Wi-Fi and test
+1. Wire ESP32 + SD + OLED + Buttons as listed
+2. Format SD card (FAT32) and copy the required files in the data folder
+3. Open Arduino IDE and install libraries:
+   - Adafruit_SSD1306
+   - Adafruit_GFX
+   - SD
+   - EEPROM
+   - DNSServer
+   - ESPAsyncWebServer
+4. Upload `esp-phisher` sketch
+5. Join the ESP32 Wi-Fi and test via browser
 
 ---
 
 ## Educational Purpose
 
-This project was created to educate users about the risks of trusting captive portals without verification. It raises awareness of phishing tactics over open Wi-Fi, and promotes safe practices such as:
-
-* Using VPNs on public networks
-* Verifying captive portal URLs
-* Enabling multi-factor authentication
-
----
-
-### 🧪 Future Feature Roadmap *(If Project Gains Popularity)*
-
-The following features are planned **only if `esp-phisher` receives significant community interest and GitHub stars**:
-
-- **Wi-Fi Passthrough Mode**  
-- **QR Code Support**  
-- **Offline Log Export**  
-- **OTA Updates via Admin Panel**  
-- **Session Timer**  
+This project educates users about:
+- Phishing threats over public Wi-Fi
+- Dangers of unverified captive portals
+- The importance of MFA and VPN usage
 
 ---
 
 ## Legal Disclaimer
 
-This software is for educational and research purposes only.
-**Do not use on unauthorized networks.**
-
-Deploying this tool on any network without clear, written permission is illegal and may violate the Computer Fraud and Abuse Act and similar laws.
+This software is for educational and research use only.  
+Using this tool on unauthorized networks is illegal and unethical.
 
 You are solely responsible for how you use this code.
 
@@ -192,10 +180,26 @@ You are solely responsible for how you use this code.
 
 **SoCal IT**  
 Ethical hacker & Wi-Fi tools developer  
-Creator of [`alfa-wifi`](https://github.com/socalit/alfa-wifi), and more.
+GitHub: [https://github.com/socalit](https://github.com/socalit)
 
 ---
 
-##  Support the Project
+⭐ Star the project if you found it useful for red teaming, research, or CTF demos.
 
-If this helped your research, education, or DEFCON demo, consider giving it a star 🌟
+---
+
+## Credits
+
+- **Feather Icons**  
+  Simple and elegant SVG icons used in the admin panel  
+  https://feathericons.com
+
+- **Chart.js**  
+  JavaScript charting library used for platform/daily analytics  
+  https://www.chartjs.org/
+
+- **Bootstrap 5.3.7**  
+  Responsive front-end framework used in `index.html` and `admin.html`  
+  https://getbootstrap.com
+
+All third-party resources are included under their respective open source licenses.

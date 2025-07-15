@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>esp-phisher Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="/bootstrap-5.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --bg:#15171b; --card:#1e2126; --text:#ffffff; --accent:#0f9d58; --accent2:#db4437; }
+    body { margin:0; min-height:100vh; background:var(--bg) center/cover no-repeat; color:var(--text); font-family:Arial,sans-serif; }
+    .topbar { background:#0d0e10; height:56px; display:flex; align-items:center; gap:.5rem; padding:0 1rem; border-bottom:1px solid #222; position:fixed; top:0; left:0; right:0; z-index:1030; }
+    .brand { font-size:1.1rem; font-weight:600; color:#fff }
+    .icon-18 { width:18px; height:18px; object-fit:contain }
+    .sidebar-off { background:var(--card); width:240px; color:var(--text) }
+    .sidebar-off a { color:var(--text); display:block; padding:.5rem 1rem; text-decoration:none }
+    .sidebar-off a:hover { background:#2a2d33 }
+    .stat-card { background:var(--card); border:1px solid var(--accent); border-radius:.75rem; color:var(--text); }
+    .stat-card .badge { background:var(--accent); color:#fff; font-size:.9rem }
+    #logBox { background:#000; border:1px solid var(--accent); border-radius:.5rem; padding:12px; max-height:55vh; overflow-y:auto; white-space:pre-wrap; font-size:.88rem; color:#0f0; }
+    .settings { background:var(--card); color:var(--text); width:300px }
+    .thumbnail { width:64px; height:40px; object-fit:cover; cursor:pointer; border:2px solid transparent }
+    .thumbnail.selected { border-color:var(--accent) }
+    .status { opacity:0; transition:.3s; margin-top:.25rem; font-weight:600 }
+    .status.show { opacity:1 }
+    .status.success { color:var(--accent) }
+    .status.error { color:var(--accent2) }
+    main { padding:72px 1rem 1rem }
+    img[src^="/img/feather/"] { filter:brightness(0) invert(1); }
+    .chart-wrapper { width:100%; height:180px; overflow:hidden }
+    .chart-wrapper canvas { display:block; width:100% !important; height:100% !important }
+    .card-header { color:#fff; }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <button class="btn btn-sm btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#navOff">
+      <img src="/img/feather/menu.svg" class="icon-18" alt="Menu">
+    </button>
+    <span class="brand">esp-phisher Admin</span>
+    <span class="ms-auto d-flex align-items-center gap-2">
+      <button class="btn btn-sm btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#settingsOff">
+        <img src="/img/feather/sliders.svg" class="icon-18" alt="Settings">
+      </button>
+    </span>
+  </header>
+
+  <div class="offcanvas offcanvas-start sidebar-off" id="navOff" tabindex="-1">
+    <div class="offcanvas-header border-bottom">
+      <h6 class="m-0">Menu</h6>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <a href="#" onclick="scrollToSection('dashboardSection')" data-bs-dismiss="offcanvas">
+        <img src="/img/feather/home.svg" class="icon-18 me-2" alt="Dashboard">Dashboard
+      </a>
+      <a href="#" onclick="scrollToSection('logsSection')" data-bs-dismiss="offcanvas">
+        <img src="/img/feather/file-text.svg" class="icon-18 me-2" alt="Logs">Logs
+      </a>
+      <a href="#" data-bs-target="#settingsOff" data-bs-toggle="offcanvas">
+        <img src="/img/feather/sliders.svg" class="icon-18 me-2" alt="Settings">Settings
+      </a>
+      <hr class="my-1">
+      <a href="#" onclick="scrollToSection('helpSection')" data-bs-dismiss="offcanvas">
+        <img src="/img/feather/help-circle.svg" class="icon-18 me-2" alt="Help">Help
+      </a>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end settings" id="settingsOff" tabindex="-1">
+    <div class="offcanvas-header border-bottom">
+      <h6 class="m-0">
+        <img src="/img/feather/sliders.svg" class="icon-18 me-1" alt="Settings">Settings
+      </h6>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+
+      <form id="ssidForm" class="mb-4">
+        <label class="form-label mb-1">
+          <img src="/img/feather/wifi.svg" class="icon-18 me-1" alt="SSID">SSID
+        </label>
+        <input class="form-control mb-2" id="ssidInput" placeholder="Set SSID">
+        <p class="small mb-2">Current: <strong id="currentSSID">--</strong></p>
+        <label class="form-label mb-1">
+          <img src="/img/feather/image.svg" class="icon-18 me-1" alt="Background">Login background
+        </label>
+        <div id="bgPreview" class="d-flex flex-wrap mb-2"></div>
+        <input type="hidden" id="bgInput" value="bg1.jpg">
+        <button class="btn btn-sm btn-outline-success w-100" type="submit">
+          <img src="/img/feather/save.svg" class="icon-18 me-1" alt="Save">Apply Settings
+        </button>
+        <p id="ssidStatus" class="status"></p>
+      </form>
+      <form id="rtcForm">
+        <label class="form-label mb-1">
+          <img src="/img/feather/clock.svg" class="icon-18 me-1" alt="Clock">Date & Time
+        </label>
+        <input type="datetime-local" class="form-control mb-2" id="rtcInput">
+        <p class="small mb-2">Current: <strong id="currentTime">--</strong></p>
+        <button class="btn btn-sm btn-outline-success w-100" type="submit">
+          <img src="/img/feather/save.svg" class="icon-18 me-1" alt="Set">Set Date & Time
+        </button>
+        <p id="timeStatus" class="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <main id="mainArea">
+    <div id="dashboardSection" class="container-fluid mt-4">
+      <div class="row g-3 text-center">
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="p-3 stat-card">
+            <img src="/img/feather/activity.svg" class="icon-18 mb-1"><br>
+            Total <span id="cntTotal" class="badge">0</span>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="p-3 stat-card">
+            <img src="/img/google.png" class="icon-18 mb-1"><br>
+            Google <span id="cntGoogle" class="badge">0</span>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="p-3 stat-card">
+            <img src="/img/facebook.png" class="icon-18 mb-1"><br>
+            Facebook <span id="cntFacebook" class="badge">0</span>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="p-3 stat-card">
+            <img src="/img/instagram.png" class="icon-18 mb-1"><br>
+            Instagram <span id="cntInstagram" class="badge">0</span>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="p-3 stat-card">
+            <img src="/img/tiktok.png" class="icon-18 mb-1"><br>
+            TikTok <span id="cntTikTok" class="badge">0</span>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="p-3 stat-card">
+            <img src="/img/feather/credit-card.svg" class="icon-18 mb-1"><br>
+            Cards <span id="cntCard" class="badge">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+      <div class="row g-3">
+        <div class="col-12 col-lg-6">
+          <div class="card" style="background:var(--card);border:1px solid #333;border-radius:.75rem">
+            <div class="card-header py-2">
+              <img src="/img/feather/pie-chart.svg" class="icon-18 me-1">Platform Split
+            </div>
+            <div class="card-body p-2">
+              <div class="chart-wrapper"><canvas id="chartPlatforms"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="card" style="background:var(--card);border:1px solid #333;border-radius:.75rem">
+            <div class="card-header py-2">
+              <img src="/img/feather/clock.svg" class="icon-18 me-1">Logins / Day (7d)
+            </div>
+            <div class="card-body p-2">
+              <div class="chart-wrapper"><canvas id="chartDaily"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="logsSection" class="container-fluid mt-4">
+      <div class="card" style="background:var(--card);border:1px solid #333;border-radius:.75rem">
+        <div class="card-header d-flex justify-content-between align-items-center" style="border-bottom:1px solid #333">
+          <span><img src="/img/feather/file-text.svg" class="icon-18 me-1">Captured Log</span>
+          <div>
+            <button id="markReadBtn" class="btn btn-sm btn-outline-light me-2">
+              <img src="/img/feather/flag.svg" class="icon-18 me-1">Mark Read
+            </button>
+            <button id="clearBtn" class="btn btn-sm btn-outline-danger">
+              <img src="/img/feather/trash-2.svg" class="icon-18 me-1">Clear
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-2"><pre id="logBox">Loading…</pre></div>
+        <div class="card-footer small" style="border-top:1px solid #333">
+          <span id="logStatus" class="status"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="helpSection" class="container-fluid mt-4">
+      <div class="card" style="background:var(--card);border:1px solid #333;border-radius:.75rem">
+        <div class="card-body text-white">
+          <h5>Help &amp; Info</h5>
+          <ul>
+            <li><strong>☰ Menu</strong>: Toggle navigation sidebar</li>
+            <li><strong>⚙️ Settings</strong>: Open settings panel</li>
+            <li><strong>📑 Mark Read</strong>: Mark logs read</li>
+            <li><strong>🗑 Clear</strong>: Clear logs</li>
+          </ul>
+          <pre>
+This software is for educational and research purposes only. Do not use on unauthorized networks.
+Deploying this tool on any network without clear, written permission is illegal and may violate the Computer Fraud and Abuse Act and similar laws.
+You are solely responsible for how you use this code.
+          </pre>
+          <p>Author: Ethical hacker and Wi-Fi tools developer SoCal IT
+            <a href="https://github.com/socalit/esp-phisher" class="github-link text-white" target="_blank">
+              github.com/socalit/esp-phisher
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/bootstrap-5.3.7/js/bootstrap.bundle.min.js"></script>
+  <script src="/chart.umd.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = id => document.getElementById(id);
+      const KEY = new URLSearchParams(location.search).get('key');
+      if (KEY !== '3000') {
+        document.body.innerHTML = '<h2 style="color:white;text-align:center;margin-top:2rem;">Unauthorized</h2>';
+        return;
+      }
+
+      const postOpts = (url, data) => ({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(Object.assign({ key: KEY }, data))
+      });
+
+      fetch('/ssid').then(r => r.text()).then(s => {
+        $('currentSSID').textContent = s;
+        $('ssidInput').value = s;
+      });
+      fetch('/bg').then(r => r.text()).then(b => {
+        $('bgInput').value = b;
+        document.querySelectorAll('.thumbnail').forEach(img => {
+          if (img.src.includes(b)) img.classList.add('selected');
+        });
+      });
+      ['bg1.jpg','bg2.jpg','bg3.jpg','bg4.jpg','bg5.jpg'].forEach((bg,i) => {
+        const img = new Image();
+        img.src = '/img/' + bg;
+        img.className = 'thumbnail' + (i===0?' selected':'');
+        img.onclick = () => {
+          document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('selected'));
+          img.classList.add('selected');
+          $('bgInput').value = bg;
+        };
+        $('bgPreview').appendChild(img);
+      });
+      $('ssidForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const st = $('ssidStatus');
+        st.textContent = 'Applying…'; st.className = 'status show';
+        try {
+          await fetch('/bg', postOpts('/bg',{ bg: $('bgInput').value }));
+          await fetch('/ssid', postOpts('/ssid',{ ssid: $('ssidInput').value.trim() }));
+          st.textContent = 'Success'; st.className = 'status success show';
+        } catch {}
+        setTimeout(() => st.classList.remove('show'), 2000);
+      });
+
+      fetch('/time?key=' + KEY).then(r => r.text()).then(t => {
+        $('currentTime').textContent = t;
+        const raw = t.slice(1,-1);
+        $('rtcInput').value = raw.slice(0,10) + 'T' + raw.slice(11,16);
+      });
+      $('rtcForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const st = $('timeStatus');
+        st.textContent = 'Setting…'; st.className = 'status show';
+        try {
+          await fetch('/time', postOpts('/time',{ datetime: $('rtcInput').value }));
+          st.textContent = 'OK'; st.className = 'status success show';
+        } catch {
+          st.textContent = 'Error'; st.className = 'status error show';
+        }
+        setTimeout(() => st.classList.remove('show'), 2000);
+      });
+
+      const plats = ['Google','Facebook','Instagram','TikTok','Card'];
+      let chartPlat, chartDay;
+      function resetCounters(){
+        ['Total',...plats].forEach(l=>{ if($('cnt'+l)) $('cnt'+l).textContent='0'; });
+      }
+      function updateCharts(lines){
+        const pc={}, byDay={};
+        plats.forEach(p=>pc[p]=0);
+        lines.forEach(l=>{
+          plats.forEach(p=>{ if(new RegExp(p,'i').test(l)) pc[p]++; });
+          const m = l.match(/\[(\d{4}-\d{2}-\d{2})/); 
+          if(m) byDay[m[1]]=(byDay[m[1]]||0)+1;
+        });
+        $('cntTotal').textContent=lines.length;
+        plats.forEach(p=>$('cnt'+p).textContent=pc[p]);
+        const dataPlat=plats.map(p=>pc[p]);
+        if(!chartPlat){
+          chartPlat=new Chart($('chartPlatforms'),{type:'bar',data:{labels:plats,datasets:[{data:dataPlat}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+        } else {
+          chartPlat.data.datasets[0].data=dataPlat; chartPlat.update();
+        }
+        const lbl=[], val=[];
+        const now=new Date();
+        for(let i=6;i>=0;i--){
+          const d=new Date(now); d.setDate(d.getDate()-i);
+          const iso=d.toISOString().slice(0,10);
+          lbl.push(iso.slice(5)); val.push(byDay[iso]||0);
+        }
+        if(!chartDay){
+          chartDay=new Chart($('chartDaily'),{type:'line',data:{labels:lbl,datasets:[{data:val,fill:false,tension:0.3,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+        } else {
+          chartDay.data.labels=lbl; chartDay.data.datasets[0].data=val; chartDay.update();
+        }
+      }
+      async function loadLog(){
+        try {
+          const r = await fetch('/log.txt?v='+Date.now());
+          if(!r.ok||r.headers.get('content-type').includes('html')) throw 0;
+          const text=(await r.text()).trim();
+          if(!text) throw 0;
+          const lines=text.split('\n').reverse();
+          updateCharts(lines);
+		  const formatted = lines.map(l => {
+          const tsMatch = l.match(/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]/);
+          const timestamp = tsMatch ? `[${tsMatch[1]}]` : '';
+
+          if (l.includes('[CreditCard]')) {
+          const p = l.match(/Name:\s*(.*?)\s*\|\s*Card:\s*(.*?)\s*\|\s*Type:\s*(.*?)\s*\|\s*Exp:\s*(.*?)\s*\|\s*CVC:\s*(.*?)\s*\|\s*Addr:\s*(.*?)\s*\|\s*City:\s*(.*?)\s*\|\s*State:\s*(.*?)\s*\|\s*Zip:\s*(.*?)\s*\|\s*Device:\s*(.*)$/);
+          if (p) {
+          return `${timestamp} \n[CreditCard] \nName: ${p[1]} \nCard: ${p[2]} \nType: ${p[3]} \nExp:${p[4]} CVC:${p[5]} \nAddr:${p[6]}\nCity: ${p[7]}\nState: ${p[8]}\nZip: ${p[9]}\nDevice: ${p[10]}`;
+         }
+       }
+
+          const m = l.match(/^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s*\[(.*?)\]\s*User:\s*(.*?)\s*\|\s*Pass:\s*(.*?)\s*\|\s*Device:\s*(.*)$/);
+          if (m) {
+          return `[${m[1]}] \n[${m[2]}] \nUser: ${m[3]} \nPass: ${m[4]} \nDevice: ${m[5]}`;
+          }
+
+          return l;
+          }).join('\n\n');
+          $('logBox').textContent=formatted;
+        } catch {
+          $('logBox').textContent='No logins captured yet.';
+          resetCounters();
+          chartPlat?.destroy(); chartDay?.destroy();
+        }
+      }
+      window.scrollToSection=id=>{ document.getElementById(id).scrollIntoView({behavior:'smooth'}); if(id==='logsSection') loadLog(); };
+      $('markReadBtn').addEventListener('click',async()=>{
+        await fetch('/mark-read',postOpts('/mark-read',{}));
+        $('logStatus').textContent='Marked'; $('logStatus').className='status success show';
+        loadLog(); setTimeout(()=>$('logStatus').classList.remove('show'),3000);
+      });
+      $('clearBtn').addEventListener('click',async()=>{
+        if(!confirm('Clear log?')) return;
+        await fetch('/clear',postOpts('/clear',{}));
+        $('logStatus').textContent='Cleared'; $('logStatus').className='status success show';
+        loadLog(); setTimeout(()=>$('logStatus').classList.remove('show'),3000);
+      });
+      loadLog();
+    });
+  </script>
+</body>
+</html>
