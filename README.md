@@ -7,7 +7,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-## 📸 Demo
+## Demo
 
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-1.JPG" width="40%">
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-5.JPG" width="40%">
@@ -64,7 +64,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-## 🛠 Hardware Requirements
+## Hardware Requirements
 
 | Component            | Connection Details                   |
 |---------------------|----------------------------------------|
@@ -103,7 +103,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-## 🧪 OLED Menu System
+## OLED Menu System
 
 - Navigated via 4 physical buttons
 - Menu options:
@@ -118,7 +118,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-## 🌐 Captive Portal Flow
+## Captive Portal Flow
 
 - Starts AP with spoofed UniFi-style MAC
 - Captures all DNS and redirects to `index.html`
@@ -128,7 +128,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ---
 
-## 🛡 Admin Access
+## Admin Access
 
 Visit: http://192.168.4.1/admin.html?key=3000
 
@@ -142,7 +142,7 @@ Features:
 
 ---
 
-## 🛠 Setup Instructions
+## Setup Instructions
 
 1. Wire ESP32 + SD + OLED + Buttons as listed
 2. Format SD card (FAT32) and copy the required files in the data folder
@@ -158,7 +158,7 @@ Features:
 
 ---
 
-## ⚠️ Educational Purpose
+## Educational Purpose
 
 This project educates users about:
 - Phishing threats over public Wi-Fi
