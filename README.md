@@ -1,6 +1,5 @@
 # esp-phisher v2.0.0
 
-**Educational use only. Do not deploy without explicit permission.**
 
 `esp-phisher` is a Wi-Fi phishing proof-of-concept built on an ESP32 that simulates a public captive portal to capture credentials. Version 2.0 introduces a modern Bootstrap UI, credit card capture mode, RTC time sync, improved OLED navigation, SD file serving, and a powerful admin dashboard.
 
