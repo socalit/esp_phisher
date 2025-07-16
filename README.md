@@ -129,7 +129,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 - Captures all DNS and redirects to `index.html`
 - Accepts POSTs to `/submit`
 - Saves formatted logs to `log.txt`
-- Redirects to `success.html` then `google.com`
+- Redirects to `index.html` with a wrong username or password error
 
 ---
 
