@@ -12,6 +12,11 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-1.JPG" width="40%">
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo1-5.JPG" width="40%">
 <img src="https://raw.githubusercontent.com/socalit/esp-phisher/1.8.2/demo/demo2-3.JPG" width="40%">
+<img src="https://github.com/socalit/esp-phisher/blob/2.0.0/demo_2.0/2.0demo1.JPG" width="40%">
+<img src="https://github.com/socalit/esp-phisher/blob/2.0.0/demo_2.0/2.0demo2.JPG" width="40%">
+<img src="https://github.com/socalit/esp-phisher/blob/2.0.0/demo_2.0/2.0settings.JPG" width="40%">
+<img src="https://github.com/socalit/esp-phisher/blob/2.0.0/demo_2.0/captive2.0.JPG" width="40%">
+<img src="https://github.com/socalit/esp-phisher/blob/2.0.0/demo_2.0/captive2.0cards.JPG" width="40%">
 
 ---
 
