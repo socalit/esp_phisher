@@ -71,21 +71,21 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 
 ## Hardware Requirements
 
-| Component            | Connection Details                   |
-|---------------------|----------------------------------------|
-| ESP32 Dev Board      | AITRIP ESP-WROOM-32                   |
-| SD Card Module       | SPI (CS: GPIO 5)                      |
+| Component            | Connection Details                    |
+|------------------_---|---------------------------------------|
+| ESP32 Dev Board      | ESP-WROOM-32                          |
+| SD Card Module       | (CS: GPIO 5) VCC 5v                   |
 | SSD1306 OLED (0.91") | I2C (SDA: GPIO 21, SCL: GPIO 22)      |
-| RTC DS3231 Module    | I2C shared with OLED                  |
-| Button – Up          | GPIO 32                               |
-| Button – Down        | GPIO 33                               |
-| Button – Enter       | GPIO 25                               |
-| Button – Back        | GPIO 26                               |
-| LED 1 (Login)        | GPIO 12                               |
-| LED 2 (Client)       | GPIO 13                               |
-| LED 3 (Power)        | GPIO 14                               |
+| RTC DS3231 Module    | I2C shared with OLED + VCC 3.3v       |
+| Button – Up          | GPIO 32          (optional)           |
+| Button – Down        | GPIO 33          (optional)           |
+| Button – Enter       | GPIO 25          (optional)           |
+| Button – Back        | GPIO 26          (optional)           |
+| LED 1 (Logs)         | GPIO 12          (optional)           |
+| LED 2 (Client)       | GPIO 13          (optional)           |
+| LED 3 (System status)| GPIO 14          (optional)           |
 
-> SD uses SPI (MISO: 19, MOSI: 23, SCK: 18). Level-shift SD if 5V-only. Use pulldown resistors for buttons.
+> SDCard Module uses SPI (MISO: GPIO 19, MOSI: GPIO 23, SCK: GPIO 18)
 
 ---
 
