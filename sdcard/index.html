@@ -256,16 +256,11 @@
     zipEL.addEventListener('input', e => { formatZip(e);         checkPayEnabled(); });
     inputs.forEach(i => i.addEventListener('input', checkPayEnabled));
 
-    window.addEventListener('load', async () => {
-      try {
-        const res = await fetch('/bg');
-        if (!res.ok) return;
-        const txt = (await res.text()).trim();
-        document.getElementById('bg-overlay').style.backgroundImage =
-          `url('/img/${txt}?v=${Date.now()}')`;
-      } catch {}
+    window.addEventListener('load', () => {
+    document.getElementById('bg-overlay').style.backgroundImage =
+    `url('/img/bg.jpg?v=${Date.now()}')`;
     });
-  </script>
+    </script>
 
 </body>
 </html>
