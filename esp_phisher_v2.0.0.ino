@@ -343,24 +343,45 @@ void setup(){
     r->send(200,"text/plain",currentBG);
   });
 
-  server.on("/bg", HTTP_POST, [](AsyncWebServerRequest* r){
-    if(!r->hasParam("key",true)||r->getParam("key",true)->value()!="3000")
-      return r->send(403,"text/plain","Forbidden");
-    if(!r->hasParam("bg",true))
-      return r->send(400,"text/plain","Missing bg");
-    String path=r->getParam("bg",true)->value();
-    if(!path.endsWith(".jpg")||path.length()>MAX_BG_LEN||!SD.exists(path))
-      return r->send(400,"text/plain","Invalid bg");
-    if(SD.exists("/img/bg.jpg")) SD.remove("/img/bg.jpg");
-    File src=SD.open(path,FILE_READ), dst=SD.open("/img/bg.jpg",FILE_WRITE);
-    if(!src||!dst){ if(src)src.close(); if(dst)dst.close(); return r->send(500,"text/plain","FS error"); }
-    uint8_t buf[256]; int n;
-    while((n=src.read(buf,256))>0) dst.write(buf,n);
-    src.close(); dst.close();
-    currentBG="bg.jpg"; saveBG(currentBG);
-    r->send(200,"text/plain","OK");
-  });
+server.on("/bg", HTTP_POST, [](AsyncWebServerRequest *request) {
+  if (!request->hasParam("key", true) || request->getParam("key", true)->value() != "3000")
+    return request->send(403, "text/plain", "Forbidden");
 
+  if (!request->hasParam("bg", true))
+    return request->send(400, "text/plain", "Missing bg");
+
+  String path = request->getParam("bg", true)->value();
+  if (!path.endsWith(".jpg") || !SD.exists("/img/" + path))
+    return request->send(400, "text/plain", "Invalid file");
+
+  String srcPath = "/img/" + path;
+  String dstPath = "/img/bg.jpg";
+  if (SD.exists(dstPath)) SD.remove(dstPath);
+
+  File src = SD.open(srcPath, FILE_READ);
+  File dst = SD.open(dstPath, FILE_WRITE);
+
+  if (!src || !dst) {
+    if (src) src.close();
+    if (dst) dst.close();
+    return request->send(500, "text/plain", "File open error");
+  }
+
+  uint8_t buf[256];
+  size_t n;
+  while ((n = src.read(buf, sizeof(buf))) > 0) {
+    dst.write(buf, n);
+  }
+
+  src.close();
+  dst.close();
+
+  currentBG = path;
+  saveBG(currentBG);
+
+  Serial.printf("✅ Copied %s → /img/bg.jpg\n", srcPath.c_str());
+  request->send(200, "text/plain", "OK");
+  });
   server.on("/ssid", HTTP_GET, [](AsyncWebServerRequest* r){
     r->send(200,"text/plain",ap_ssid);
   });
@@ -392,7 +413,7 @@ void setup(){
       return r->send(403,"text/plain","Forbidden");
     if(!r->hasParam("datetime",true))
       return r->send(400,"text/plain","Missing datetime");
-    String dt=r->getParam("datetime",true)->value(); // "YYYY-MM-DDThh:mm"
+    String dt=r->getParam("datetime",true)->value();
     int y=dt.substring(0,4).toInt(),
         m=dt.substring(5,7).toInt(),
         d=dt.substring(8,10).toInt(),
