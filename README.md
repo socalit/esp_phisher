@@ -72,7 +72,7 @@ GitHub: [github.com/socalit](https://github.com/socalit)
 ## Hardware Requirements
 
 | Component            | Connection Details                    |
-|------------------_---|---------------------------------------|
+|----------------------|---------------------------------------|
 | ESP32 Dev Board      | ESP-WROOM-32                          |
 | SD Card Module       | (CS: GPIO 5) VCC 5v                   |
 | SSD1306 OLED (0.91") | I2C (SDA: GPIO 21, SCL: GPIO 22)      |
